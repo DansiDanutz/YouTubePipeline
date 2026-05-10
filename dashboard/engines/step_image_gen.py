@@ -431,9 +431,19 @@ def fetch_fal(prompt: str, out_path: str, width: int = DEFAULT_W,
     return bool(result.get('ok'))
 
 
+def _fetch_comfy_cloud(prompt, out_path, **kwargs):
+    """Lazy wrapper — only imports comfy_cloud_client when actually invoked."""
+    try:
+        from .comfy_cloud_client import fetch_comfy_cloud
+        return fetch_comfy_cloud(prompt, out_path, **kwargs)
+    except Exception as e:
+        return {'ok': False, 'error': f'comfy-cloud unavailable: {e}'}
+
+
 PROVIDER_REGISTRY = {
     'higgsfield':    fetch_higgsfield,
     'comfyui':       fetch_comfyui,
+    'comfy-cloud':   _fetch_comfy_cloud,           # opt-in remote OSS lane
     'fal':           fetch_fal,
     'gpt-image-1':   fetch_openai_image2,
     'image2':        fetch_openai_image2,         # alias
@@ -452,10 +462,21 @@ DEFAULT_PROVIDER_CHAIN = ['comfyui']
 
 def _provider_chain() -> list[str]:
     raw = os.environ.get('IMAGE_GEN_PROVIDERS', '')
-    if not raw.strip():
-        return DEFAULT_PROVIDER_CHAIN
-    chain = [p.strip().lower() for p in raw.split(',') if p.strip()]
-    return [p for p in chain if p in PROVIDER_REGISTRY] or DEFAULT_PROVIDER_CHAIN
+    if raw.strip():
+        chain = [p.strip().lower() for p in raw.split(',') if p.strip()]
+        return [p for p in chain if p in PROVIDER_REGISTRY] or DEFAULT_PROVIDER_CHAIN
+    # Default chain. Auto-prepend 'comfy-cloud' when the user has explicitly
+    # opted in (ZMARTY_USE_COMFY_CLOUD=1) AND has a key — this routes the
+    # production lane through Comfy Cloud (Flux dev, LTX-Video, etc.) while
+    # keeping local ComfyUI as the fallback. Two gates keep paid spend explicit.
+    chain = list(DEFAULT_PROVIDER_CHAIN)
+    try:
+        from . import comfy_cloud_client as _cc
+        if _cc.is_configured():
+            chain = ['comfy-cloud'] + [p for p in chain if p != 'comfy-cloud']
+    except Exception:
+        pass
+    return chain
 
 
 def _have_real_openai_key() -> bool:
@@ -499,9 +520,16 @@ def image_provider_status() -> dict:
         fal_ok = _fal.is_configured()
     except Exception:
         pass
+    cloud_status = {'available': False, 'has_key': False, 'opted_in': False, 'note': '(client not loaded)'}
+    try:
+        from . import comfy_cloud_client as _cc
+        cloud_status = _cc.status()
+    except Exception:
+        pass
     return {
         'higgsfield':   {'available': higgs_ok, 'note': higgs_note},
         'comfyui':      {'available': _comfyui_reachable(), 'host': COMFYUI_HOST},
+        'comfy-cloud':  cloud_status,
         'fal':          {'available': fal_ok, 'note': '' if fal_ok else 'set FAL_API_KEY'},
         'gpt-image-1':  {'available': real_openai, 'note': '' if real_openai else 'needs real OpenAI key (sk-...)'},
         'siegfried':    {'available': bool(SIEGFRIED_URL), 'url': SIEGFRIED_URL or '(unset)'},

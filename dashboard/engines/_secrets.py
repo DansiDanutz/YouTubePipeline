@@ -64,6 +64,7 @@ KEYCHAIN_MAP: dict[str, str] = {
     'FAL_API_KEY':                    'openclaw.fal',
     'FAL_KEY':                        'openclaw.fal',
     'PAPERCLIP_API_KEY':              'openclaw.paperclip',
+    'COMFY_CLOUD_API_KEY':            'COMFY_CLOUD_API_KEY',     # Comfy Cloud opt-in lane
     'OPENCLAW_GATEWAY_TOKEN':         'openclaw.gateway_token',
     'OPENCLAW_GATEWAY_REMOTE_TOKEN':  'openclaw.gateway_remote_token',
     'TELEGRAM_WEBHOOK_SECRET_TOKEN':  'openclaw.telegram_webhook_secret',
