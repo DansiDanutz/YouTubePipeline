@@ -564,9 +564,25 @@ def video_provider_status() -> dict:
         fal_ok = _fal.is_configured()
     except Exception:
         pass
+    cloud_status = {'available': False, 'has_key': False, 'opted_in': False, 'note': '(client not loaded)'}
+    try:
+        from . import comfy_cloud_client as _cc
+        cs = _cc.status()
+        # Video on Cloud uses LTX-Video lineup (ltx-2-19b/22b) — same auth gates as image
+        cloud_status = {**cs, 'note': cs.get('note') or 'LTX-Video 19B/22B available on Cloud'}
+    except Exception:
+        pass
+    wan_status = {'available': False, 'note': '(client not loaded)'}
+    try:
+        from . import wan_client as _wan
+        wan_status = _wan.status()
+    except Exception:
+        pass
     return {
         'comfyui':      {'available': _comfyui_reachable(), 'host': COMFYUI_HOST,
                          'note': 'requires comfyui-workflows/wan21-img2vid.json'},
+        'comfy-cloud':  cloud_status,
+        'wan':          wan_status,
         'seedance':     {'available': seedance_ok, 'note': '' if seedance_ok else 'set SEEDANCE_API_URL + SEEDANCE_API_KEY'},
         'higgsfield':   {'available': higgs_ok, 'note': higgs_note},
         'fal':          {'available': fal_ok, 'note': '' if fal_ok else 'set FAL_API_KEY'},
@@ -587,10 +603,28 @@ DEFAULT_VIDEO_CHAIN = ['comfyui']  # OSS-only (Wan 2.1/2.2 via local ComfyUI). l
 
 def _video_provider_chain() -> list[str]:
     raw = os.environ.get('VIDEO_GEN_PROVIDERS', '')
-    if not raw.strip():
-        return DEFAULT_VIDEO_CHAIN
-    chain = [p.strip().lower() for p in raw.split(',') if p.strip()]
-    return [p for p in chain if p in DEFAULT_VIDEO_CHAIN] or DEFAULT_VIDEO_CHAIN
+    if raw.strip():
+        chain = [p.strip().lower() for p in raw.split(',') if p.strip()]
+        return chain or DEFAULT_VIDEO_CHAIN
+    # Default chain. Auto-prepend OSS lanes when their gates are satisfied:
+    #   1. Wan 2.2 local (when ComfyUI :8000 + all 3 model files present)
+    #   2. Comfy Cloud LTX-Video (when ZMARTY_USE_COMFY_CLOUD=1 + key)
+    #   3. local ComfyUI (the existing default)
+    # Each provider self-checks at invocation time, so prepending is safe.
+    chain = list(DEFAULT_VIDEO_CHAIN)
+    try:
+        from . import wan_client as _wan
+        if _wan.is_configured() and 'wan' not in chain:
+            chain = ['wan'] + chain
+    except Exception:
+        pass
+    try:
+        from . import comfy_cloud_client as _cc
+        if _cc.is_configured() and 'comfy-cloud' not in chain:
+            chain = ['comfy-cloud'] + chain
+    except Exception:
+        pass
+    return chain
 
 
 COMFYUI_I2V_WORKFLOW_PATH = os.environ.get(

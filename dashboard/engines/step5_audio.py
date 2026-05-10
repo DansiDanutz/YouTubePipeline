@@ -232,6 +232,60 @@ def _apply_elevenlabs_to_spec(audio_spec: dict, voice_preference: str = 'brian')
     return audio_spec
 
 
+def _apply_vibevoice_to_spec(audio_spec: dict) -> dict:
+    """Rewrite an audio spec to use Microsoft VibeVoice 1.5B (OSS, MIT) when the
+    local ComfyUI is reachable and the model files are on disk. This is the
+    quality default for OSS-only operation — replaces robotic Piper with
+    human-quality TTS that supports voice cloning.
+
+    No-op when ComfyUI is down or model is missing — leaves Piper default
+    untouched. Sets `_vibevoice_status` for the dashboard provider bar to
+    show why it did or did not engage.
+    """
+    try:
+        from . import vibevoice_client as _vv
+    except Exception as e:
+        audio_spec['_vibevoice_status'] = f'skipped: client import failed: {e}'
+        return audio_spec
+    if not _vv.is_configured():
+        audio_spec['_vibevoice_status'] = (
+            'skipped: ComfyUI :8000 unreachable or VibeVoice-1.5B not in models/vibevoice/'
+        )
+        return audio_spec
+    # Don't override if ElevenLabs already applied (operator opted in to paid)
+    if audio_spec.get('tts_engine') == 'elevenlabs':
+        audio_spec['_vibevoice_status'] = 'skipped: elevenlabs already applied'
+        return audio_spec
+
+    audio_spec['tts_engine']   = 'vibevoice'
+    audio_spec['voice_model']  = f'vibevoice:{_vv.VIBEVOICE_DEFAULT_MODEL}'
+
+    # Rewrite per-scene tts_command to invoke the vibevoice_client CLI entry.
+    # `python3.13 -m engines.vibevoice_client "<text>" "<out>"` — keep the same
+    # output paths the LLM-drafted spec expected (so step7_render finds them).
+    cli_base = 'python3.13 -m engines.vibevoice_client'
+    for seg in audio_spec.get('per_scene_audio', []) or audio_spec.get('segments', []) or []:
+        if not isinstance(seg, dict):
+            continue
+        text = (seg.get('tts_text') or seg.get('text') or '').replace('"', '\\"')
+        out_file = seg.get('output_file') or ''
+        if not out_file and seg.get('section'):
+            out_file = f'audio/{seg["section"]}.wav'
+        if text and out_file:
+            seg['output_file'] = out_file
+            seg['tts_command'] = f'{cli_base} "{text}" "{out_file}"'
+
+    master = audio_spec.get('master_assembly') or {}
+    if isinstance(master, dict) and not master.get('output_file', '').endswith('.wav'):
+        master['output_file'] = (master.get('output_file') or 'narration.wav')
+        audio_spec['master_assembly'] = master
+
+    audio_spec['_vibevoice_status'] = (
+        f'enabled: model={_vv.VIBEVOICE_DEFAULT_MODEL} (OSS MIT, runs via local ComfyUI)'
+    )
+    return audio_spec
+
+
 # ---------------------------------------------------------------------------
 # LLM helpers
 # ---------------------------------------------------------------------------
@@ -981,8 +1035,12 @@ def run_step5(script: str = '', scene_manifest: dict | None = None,
 
     quality_rating = compute_quality(validators, fleet, convergence_passes)
 
-    # Spec: ElevenLabs Brian (close to Morgan Freeman) is the preferred voice.
-    # Rewrites the LLM-drafted Piper spec when the key is configured. No-op otherwise.
+    # OSS-only TTS routing (in priority order):
+    #   1. VibeVoice (local ComfyUI, MIT, human-quality voice cloning) — auto when available
+    #   2. ElevenLabs Brian (paid) — only when ZMARTY_ALLOW_PAID_TTS=1 + key
+    #   3. Piper en_US-lessac-medium (local fallback, always present)
+    # Each function is idempotent + checks its own gates; safe to call in order.
+    audio_spec = _apply_vibevoice_to_spec(audio_spec)
     audio_spec = _apply_elevenlabs_to_spec(audio_spec, voice_preference=voice_preference)
 
     try:

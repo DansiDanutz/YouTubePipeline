@@ -157,3 +157,21 @@ def synthesize(text: str, output_wav: str | Path,
                 'prompt_id': pid, 'duration_s': round(time.monotonic() - t0, 2)}
     except Exception as e:
         return {'ok': False, 'error': str(e), 'duration_s': round(time.monotonic() - t0, 2)}
+
+
+# ---------------------------------------------------------------------------
+# CLI entry: `python3.13 -m engines.vibevoice_client "<text>" "<output.wav>"`
+# Used by step5_audio.py spec rewrites — invoked at render time per scene.
+# ---------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) < 3:
+        print('usage: python -m engines.vibevoice_client "<text>" "<output.wav>" [model]', file=sys.stderr)
+        sys.exit(2)
+    text = sys.argv[1]
+    out  = sys.argv[2]
+    model = sys.argv[3] if len(sys.argv) > 3 else VIBEVOICE_DEFAULT_MODEL
+    result = synthesize(text, out, model=model)
+    print(json.dumps(result))
+    sys.exit(0 if result.get('ok') else 1)
