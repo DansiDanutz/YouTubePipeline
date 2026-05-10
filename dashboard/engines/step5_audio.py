@@ -286,6 +286,48 @@ def _apply_vibevoice_to_spec(audio_spec: dict) -> dict:
     return audio_spec
 
 
+def _apply_kokoro_to_spec(audio_spec: dict) -> dict:
+    """Rewrite an audio spec to use Kokoro-82M (Apache 2.0, OSS) when the local
+    Python install + model files exist. Kokoro is the preferred OSS TTS lane
+    because it ships as a single ONNX file with no transformers dependency,
+    avoiding the class-conflict bug that breaks VibeVoice in ComfyUI.
+
+    No-op when Kokoro isn't installed -> falls through to VibeVoice -> Piper.
+    """
+    try:
+        from . import kokoro_client as _kk
+    except Exception as e:
+        audio_spec['_kokoro_status'] = f'skipped: client import failed: {e}'
+        return audio_spec
+    if not _kk.is_configured():
+        audio_spec['_kokoro_status'] = 'skipped: ' + (_kk.status().get('note', 'unconfigured'))
+        return audio_spec
+    if audio_spec.get('tts_engine') in ('elevenlabs', 'vibevoice'):
+        audio_spec['_kokoro_status'] = f'skipped: {audio_spec["tts_engine"]} already applied'
+        return audio_spec
+
+    audio_spec['tts_engine']  = 'kokoro'
+    audio_spec['voice_model'] = f'kokoro:{_kk.KOKORO_DEFAULT_VOICE}'
+
+    cli_base = 'python3.13 -m engines.kokoro_client'
+    for seg in audio_spec.get('per_scene_audio', []) or audio_spec.get('segments', []) or []:
+        if not isinstance(seg, dict):
+            continue
+        text = (seg.get('tts_text') or seg.get('text') or '').replace('"', '\\"')
+        out_file = seg.get('output_file') or ''
+        if not out_file and seg.get('section'):
+            out_file = f'audio/{seg["section"]}.wav'
+        if text and out_file:
+            seg['output_file'] = out_file
+            seg['tts_command'] = f'{cli_base} "{text}" "{out_file}"'
+
+    audio_spec['_kokoro_status'] = (
+        f'enabled: model=Kokoro-82M voice={_kk.KOKORO_DEFAULT_VOICE} '
+        f'(Apache 2.0, single ONNX, no transformers conflict)'
+    )
+    return audio_spec
+
+
 # ---------------------------------------------------------------------------
 # LLM helpers
 # ---------------------------------------------------------------------------
@@ -1036,10 +1078,12 @@ def run_step5(script: str = '', scene_manifest: dict | None = None,
     quality_rating = compute_quality(validators, fleet, convergence_passes)
 
     # OSS-only TTS routing (in priority order):
-    #   1. VibeVoice (local ComfyUI, MIT, human-quality voice cloning) — auto when available
-    #   2. ElevenLabs Brian (paid) — only when ZMARTY_ALLOW_PAID_TTS=1 + key
-    #   3. Piper en_US-lessac-medium (local fallback, always present)
-    # Each function is idempotent + checks its own gates; safe to call in order.
+    #   1. Kokoro-82M (Apache 2.0, single ONNX, no transformers conflict) — preferred OSS lane
+    #   2. VibeVoice (MIT, voice cloning) — fallback OSS, has known upstream class-conflict bug
+    #   3. ElevenLabs Brian (paid) — only when ZMARTY_ALLOW_PAID_TTS=1 + key
+    #   4. Piper en_US-lessac-medium (local fallback, always present)
+    # Each function is idempotent + self-gates; safe to call in order. First win sticks.
+    audio_spec = _apply_kokoro_to_spec(audio_spec)
     audio_spec = _apply_vibevoice_to_spec(audio_spec)
     audio_spec = _apply_elevenlabs_to_spec(audio_spec, voice_preference=voice_preference)
 

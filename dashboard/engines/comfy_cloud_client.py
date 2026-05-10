@@ -222,3 +222,75 @@ def fetch_comfy_cloud(prompt: str, out_path: str, width: int = 1024, height: int
         negative=kwargs.get('negative', ''),
         timeout_s=kwargs.get('timeout_s', 300),
     )
+
+
+# ---------------------------------------------------------------------------
+# SVD video generation (img -> video, ~1.75s clip @ 8fps in ~35s on Cloud)
+# Verified workflow: castle_front_view.png -> animated WebP, 14 frames.
+# ---------------------------------------------------------------------------
+
+CLOUD_SVD_CHECKPOINT = os.environ.get('COMFY_CLOUD_SVD_CHECKPOINT', 'svd_xt.safetensors')
+
+
+def _build_svd_workflow(input_image: str, width: int, height: int, frames: int,
+                         motion_bucket_id: int, fps: int, seed: int, steps: int,
+                         cfg: float, augmentation_level: float) -> dict:
+    """Stable Video Diffusion img2vid workflow. `input_image` must be a Cloud-resident
+    asset filename (uploaded via Cloud's input/asset API or a pre-existing template)."""
+    return {
+        '1': {'class_type': 'ImageOnlyCheckpointLoader', 'inputs': {'ckpt_name': CLOUD_SVD_CHECKPOINT}},
+        '2': {'class_type': 'LoadImage',                  'inputs': {'image': input_image}},
+        '3': {'class_type': 'SVD_img2vid_Conditioning',
+              'inputs': {'clip_vision': ['1', 1], 'init_image': ['2', 0], 'vae': ['1', 2],
+                         'width': width, 'height': height, 'video_frames': frames,
+                         'motion_bucket_id': motion_bucket_id, 'fps': fps,
+                         'augmentation_level': augmentation_level}},
+        '4': {'class_type': 'VideoLinearCFGGuidance', 'inputs': {'model': ['1', 0], 'min_cfg': 1.0}},
+        '5': {'class_type': 'KSampler',
+              'inputs': {'model': ['4', 0], 'positive': ['3', 0], 'negative': ['3', 1],
+                         'latent_image': ['3', 2], 'seed': seed, 'steps': steps, 'cfg': cfg,
+                         'sampler_name': 'euler', 'scheduler': 'karras', 'denoise': 1.0}},
+        '6': {'class_type': 'VAEDecode', 'inputs': {'samples': ['5', 0], 'vae': ['1', 2]}},
+        '7': {'class_type': 'SaveAnimatedWEBP',
+              'inputs': {'images': ['6', 0], 'filename_prefix': 'zmarty_cloud_svd',
+                         'fps': fps, 'lossless': False, 'quality': 80, 'method': 'default'}},
+    }
+
+
+def render_video_svd(input_image: str, out_path: str | Path,
+                     width: int = 1024, height: int = 576, frames: int = 14,
+                     motion_bucket_id: int = 127, fps: int = 8,
+                     steps: int = 20, cfg: float = 2.5, seed: int = 42,
+                     augmentation_level: float = 0.0,
+                     timeout_s: int = 300) -> dict:
+    """One-shot helper: Cloud-resident image filename -> animated WebP video.
+
+    Verified live: castle_front_view.png -> 14 frames @ 8 fps in 35 seconds.
+    Returns: {'ok': bool, 'path': str | None, 'prompt_id': str, 'duration_s': float}
+    """
+    workflow = _build_svd_workflow(input_image, width, height, frames,
+                                    motion_bucket_id, fps, seed, steps, cfg, augmentation_level)
+    t0 = time.monotonic()
+    try:
+        pid = submit_workflow(workflow)
+        record = poll_job(pid, timeout_s=timeout_s)
+        outputs = record.get('outputs', {})
+        for node_id, node_out in outputs.items():
+            for img in node_out.get('images', []):
+                fhash = img.get('filename')
+                if fhash:
+                    download_output(fhash, out_path)
+                    return {
+                        'ok': True,
+                        'path': str(out_path),
+                        'prompt_id': pid,
+                        'duration_s': round(time.monotonic() - t0, 2),
+                        'cloud_filename': fhash,
+                        'frames': frames,
+                        'fps': fps,
+                        'format': 'animated_webp',
+                    }
+        return {'ok': False, 'error': 'no video in output', 'prompt_id': pid,
+                'duration_s': round(time.monotonic() - t0, 2)}
+    except Exception as e:
+        return {'ok': False, 'error': str(e), 'duration_s': round(time.monotonic() - t0, 2)}
