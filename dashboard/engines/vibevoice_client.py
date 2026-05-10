@@ -108,7 +108,24 @@ def _poll(prompt_id: str, timeout_s: int = 600, interval_s: float = 3.0) -> dict
             with urllib.request.urlopen(f'{COMFYUI_HOST}/history/{prompt_id}', timeout=10) as r:
                 hist = json.loads(r.read().decode('utf-8'))
             if prompt_id in hist:
-                return hist[prompt_id]
+                rec = hist[prompt_id]
+                # Fail-fast on ComfyUI execution errors so we surface the real
+                # cause (e.g. VibeVoice class conflict in transformers) instead
+                # of waiting full timeout for empty outputs.
+                status = rec.get('status', {}).get('status_str')
+                if status == 'error':
+                    msgs = rec.get('status', {}).get('messages', [])
+                    err_msg = ''
+                    for kind, payload in msgs:
+                        if kind == 'execution_error':
+                            err_msg = payload.get('exception_message') or str(payload)
+                            break
+                    raise RuntimeError(f'ComfyUI execution_error: {err_msg or "unknown"}')
+                # Status 'success' OR record present but not yet finalized (return; caller checks outputs)
+                if status in ('success', None) and rec.get('outputs') is not None:
+                    return rec
+        except RuntimeError:
+            raise
         except Exception:
             pass
         time.sleep(interval_s)
