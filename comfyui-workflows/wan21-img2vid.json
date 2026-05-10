@@ -1,0 +1,76 @@
+{
+  "last_node_id": 20,
+  "last_link_id": 25,
+  "nodes": [
+    {
+      "id": 11,
+      "type": "LoadImage",
+      "pos": [-200, 400],
+      "size": [320, 280],
+      "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [12]}],
+      "widgets_values": ["zmarty-scene01-base.png", "image"]
+    },
+    {
+      "id": 12,
+      "type": "WanImageToVideo",
+      "pos": [200, 400],
+      "size": [360, 280],
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 12},
+        {"name": "model", "type": "MODEL", "link": 13}
+      ],
+      "outputs": [{"name": "LATENT", "type": "LATENT", "links": [14]}],
+      "widgets_values": [
+        "Camera slowly pushes into the crimson liquidation zone. Data particles pulse and drift upward like digital embers. Subtle parallax depth. Cinematic motion, 30fps.",
+        30,
+        512,
+        512,
+        5,
+        "euler",
+        "normal"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "CheckpointLoaderSimple",
+      "pos": [-200, 200],
+      "size": [340, 100],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [13]},
+        {"name": "CLIP", "type": "CLIP", "links": []},
+        {"name": "VAE", "type": "VAE", "links": [15]}
+      ],
+      "widgets_values": ["wan2.1-i2v-14b.safetensors"]
+    },
+    {
+      "id": 14,
+      "type": "VAEDecode",
+      "pos": [640, 400],
+      "size": [220, 50],
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 14},
+        {"name": "vae", "type": "VAE", "link": 15}
+      ],
+      "outputs": [{"name": "IMAGE", "type": "IMAGE", "links": [16]}]
+    },
+    {
+      "id": 15,
+      "type": "SaveImage",
+      "pos": [920, 400],
+      "size": [320, 280],
+      "inputs": [{"name": "images", "type": "IMAGE", "link": 16}],
+      "widgets_values": ["zmarty-scene01-video"]
+    }
+  ],
+  "links": [
+    [12, 11, 0, 12, 0, "IMAGE"],
+    [13, 13, 0, 12, 1, "MODEL"],
+    [14, 12, 0, 14, 0, "LATENT"],
+    [15, 13, 2, 14, 1, "VAE"],
+    [16, 14, 0, 15, 0, "IMAGE"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

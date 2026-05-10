@@ -1,0 +1,314 @@
+{
+  "project": "danslab-100k-2027-v2",
+  "subject": "This is the first video, no filters, no polish, just the raw reality of building in public.\n\nMy core bet is simple. Six ",
+  "length_seconds": 0,
+  "fps": 30,
+  "total_frames": 0,
+  "scene_count": 6,
+  "scenes": [
+    {
+      "scene_id": "hook",
+      "kind": "",
+      "index": 0,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "slow cinematic dolly-in toward central glowing element, faint particles drift up, anticipation",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_01_hook.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_01_hook.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:49:54.975722+00:00",
+      "version": 3,
+      "component_type": "TextSlide",
+      "animation_in": "opacity 0→1 over 15 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#004D9E",
+      "accent_color": "#38B2AC",
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "infographic",
+          "type": "video",
+          "dimensions": "1720x760",
+          "source_hint": "generated infographic with Nervix infrastructure"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{0}} durationInFrames={{heroFrames}}><FadeIn><TextSlideText style={{fontSize: '4em', fontFamily: displayFont, color: '#004D9E'}}>{headline}</TextSlideText></FadeIn></Sequence></AbsoluteFill>",
+      "notes": "Ensure text preloaded with delayRender/continueRender"
+    },
+    {
+      "scene_id": "thesis",
+      "kind": "",
+      "index": 1,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "gentle camera pan left-to-right revealing the full composition, soft volumetric light shifting, atmospheric depth",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_02_thesis.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_02_thesis.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:49:23.559827+00:00",
+      "version": 3,
+      "component_type": "TextSlide",
+      "animation_in": "opacity 0→1 over 5 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#004D9E",
+      "accent_color": null,
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "thesis_text",
+          "type": "text",
+          "dimensions": "1720x250",
+          "source_hint": "The challenge is monetization sequencing"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{5}} durationInFrames={{thesisFrames}}><FadeIn><TextSlideText style={{fontSize: '3em', fontFamily: displayFont, color: '#004D9E'}}>{'The challenge is monetization sequencing'}</TextSlideText></FadeIn></Sequence></AbsoluteFill>",
+      "notes": ""
+    },
+    {
+      "scene_id": "evidence_1",
+      "kind": "",
+      "index": 2,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_03_evidence_1.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_03_evidence_1.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:48:32.512458+00:00",
+      "version": 3,
+      "component_type": "ChartReveal",
+      "animation_in": "opacity 0→1 over 5 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#38B2AC",
+      "accent_color": null,
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "evidence_1_chart",
+          "type": "chart",
+          "dimensions": "1720x650",
+          "source_hint": "Monetization metrics"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{15}} durationInFrames={{evidence1Frames}}><FadeIn><ChartReveal chart={<LineChart data={data} />}</ChartReveal></Sequence></AbsoluteFill>",
+      "notes": ""
+    },
+    {
+      "scene_id": "evidence_2",
+      "kind": "",
+      "index": 3,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "cinematic crane down revealing scene, gentle particle motion, depth-of-field shift",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_04_evidence_2.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_04_evidence_2.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:50:25.961421+00:00",
+      "version": 3,
+      "component_type": "CodeBlock",
+      "animation_in": "opacity 0→1 over 5 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#38B2AC",
+      "accent_color": null,
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "evidence_2_code",
+          "type": "text",
+          "dimensions": "1720x450",
+          "source_hint": "Sample backend code snippet"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{30}} durationInFrames={{evidence2Frames}}><FadeIn><CodeBlock code={code}</CodeBlock></FadeIn></Sequence></AbsoluteFill>",
+      "notes": ""
+    },
+    {
+      "scene_id": "implication",
+      "kind": "",
+      "index": 4,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "wide slow zoom-out exposing scale, atmospheric haze drifts, golden-hour shifts",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_05_implication.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_05_implication.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:51:58.732978+00:00",
+      "version": 3,
+      "component_type": "TextSlide",
+      "animation_in": "opacity 0→1 over 5 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#004D9E",
+      "accent_color": null,
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "implication_text",
+          "type": "text",
+          "dimensions": "1720x300",
+          "source_hint": "Explaining the implications of evidence and thesis"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{45}} durationInFrames={{implicationFrames}}><FadeIn><TextSlideText style={{fontSize: '3em', fontFamily: displayFont, color: '#004D9E'}}>{'Implications of our findings'}</TextSlideText></FadeIn></Sequence></AbsoluteFill>",
+      "notes": ""
+    },
+    {
+      "scene_id": "cta",
+      "kind": "",
+      "index": 5,
+      "label": "",
+      "duration_seconds": 0.0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "narration_excerpt": "",
+      "image_prompt": "editorial cinematic dark composition, deep black backdrop with gold accent, single hero element, atmospheric documentary feel, scene_function=, visual_metaphor: . Story beat: . 1920x1080, no text, no people",
+      "motion_prompt": "slow forward push toward doorway/path, glow intensifies, inviting forward motion",
+      "image_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_06_cta.jpg",
+      "motion_clip_path": "Youtube-videos/danslab-100k-2027-v2/scenes/scene_06_cta.mp4",
+      "image_provider": "gpt-image-1",
+      "motion_provider": "fal",
+      "last_regenerated_at": "2026-05-05T16:55:09.641087+00:00",
+      "version": 3,
+      "component_type": "ButtonReveal",
+      "animation_in": "opacity 0→1 over 5 frames",
+      "animation_out": "transform translateY(-40px) + opacity 1→0 over 10 frames",
+      "bg_color": "#F5F8FA",
+      "text_color": "#38B2AC",
+      "accent_color": null,
+      "layout": "centered-vertical",
+      "assets": [
+        {
+          "name": "cta_button",
+          "type": "button",
+          "dimensions": "100x40",
+          "source_hint": "Sign up to our newsletter button"
+        }
+      ],
+      "jsx_blueprint": "<AbsoluteFill style={{background: '#F5F8FA'}}><Sequence from={{60}} durationInFrames={{ctaFrames}}><FadeIn><ButtonReveal buttonText={'Sign Up'} onClick={() => {console.log('Sign up clicked')}} /></ButtonReveal></Sequence></AbsoluteFill>",
+      "notes": ""
+    }
+  ],
+  "design_system": {
+    "color_palette": [
+      {
+        "role": "background",
+        "hex": "#F5F8FA",
+        "name": "Soft Mist",
+        "use": "Main background and static elements"
+      },
+      {
+        "role": "primary",
+        "hex": "#004D9E",
+        "name": "Tech Blue",
+        "use": "Text, highlights, and key elements"
+      },
+      {
+        "role": "accent",
+        "hex": "#38B2AC",
+        "name": "Fresh Green",
+        "use": "Accent points, call-to-action buttons"
+      },
+      {
+        "role": "highlight",
+        "hex": "#FFD60A",
+        "name": "Yellow Gold",
+        "use": "Important information and transitions"
+      }
+    ],
+    "typography": {
+      "display": {
+        "family": "IBM Plex Sans",
+        "weight": "700",
+        "use": "Headings, titles, and important text"
+      },
+      "body": {
+        "family": "IBM Plex Serif",
+        "weight": "400",
+        "use": "Body copy and descriptions"
+      },
+      "mono": {
+        "family": "Fira Code",
+        "weight": "400",
+        "use": "Code snippets and technical details"
+      }
+    },
+    "motion_principles": [
+      {
+        "principle": "Smooth Transitions",
+        "properties_used": [
+          "transform",
+          "opacity"
+        ],
+        "duration_ms": 300,
+        "easing": "cubic-bezier(0.25, 0.1, 0.25, 1)"
+      },
+      {
+        "principle": "Highlighting Key Elements",
+        "properties_used": [
+          "scale",
+          "rotate",
+          "clip-path"
+        ],
+        "duration_ms": 500,
+        "easing": "ease-in-out"
+      }
+    ],
+    "texture_atmosphere": "<A subtle texture with a slight grain to maintain the academic and technical feel. Blurring can be used for depth and layering, but sparingly to keep focus on key elements>",
+    "scene_treatments": {
+      "hook": "<A clean animated infographic of Nervix's infrastructure with 19 adapters fading in one by one, accompanied by a smooth transition from background to Tech Blue highlight.>",
+      "thesis": "<A text overlay 'The challenge is monetization sequencing' appears with increasing opacity and scale, followed by an academic chart displaying the multi-agent fleet dispatch system in action>",
+      "evidence_1": "<Demonstration of each project (DansLab, ZmartyChat, Crawdbot, MyWork) with a gradual reveal from off-screen using transform property. Each is highlighted briefly before fading out to keep focus on the overall ecosystem build-up>",
+      "evidence_2": "<A detailed visual representation of monetization tiers, free, subscription, and pay-per-use models appearing one by one with fadeIn and fadeOut animations to maintain clarity and coherence.>",
+      "implication": "<An animated overlay appears over key areas showing interconnectedness and value creation within the ecosystem using scale and rotate properties for emphasis. The text 'This is the structural solution that makes the entire fleet viable' fades in with a smooth transition from background color>",
+      "cta": "<A bright yellow gold button labeled 'Join the Fleet' appears on screen, growing in size with a slight hover effect and scale animation to draw attention>"
+    },
+    "asset_checklist": [
+      "IBM Plex Sans font",
+      "IBM Plex Serif font",
+      "Fira Code font",
+      "Tech Blue color scheme (hex: #004D9E)",
+      "Fresh Green color scheme (hex: #38B2AC)",
+      "Yellow Gold highlight color scheme (hex: #FFD60A)",
+      "Illustrations of Nervix infrastructure and projects",
+      "Infographic elements for monetization tiers",
+      "Icons for project representations"
+    ],
+    "tools_recommended": [
+      "Remotion",
+      "Canvas 2D",
+      "GSAP"
+    ]
+  },
+  "composition_id": "",
+  "saved_at": "2026-05-05T16:55:09.641459+00:00",
+  "manifest_version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "btc-dashboard",
+      "runtimeExecutable": "python3.13",
+      "runtimeArgs": ["server.py", "8771"],
+      "port": 8771,
+      "cwd": "/Users/davidai/Zmarty-Video-Pipeline/dashboard"
+    }
+  ]
+}

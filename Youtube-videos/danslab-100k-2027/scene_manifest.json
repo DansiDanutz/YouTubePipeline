@@ -1,0 +1,112 @@
+{
+  "project": "danslab-100k-2027",
+  "subject": "One hundred thousand dollars by twenty twenty four. This is DansLab AI Agent Company's bold revenue target.\n\nDansLab AI ",
+  "length_seconds": 0,
+  "fps": 30,
+  "total_frames": 0,
+  "scene_count": 0,
+  "scenes": [],
+  "design_system": {
+    "color_palette": [
+      {
+        "role": "background",
+        "hex": "#FFFFFF",
+        "name": "White Background",
+        "use": "Overall scene background"
+      },
+      {
+        "role": "primary",
+        "hex": "#007BFF",
+        "name": "Tech Blue",
+        "use": "Text, buttons, highlights"
+      },
+      {
+        "role": "accent",
+        "hex": "#6F4E37",
+        "name": "Earthy Brown",
+        "use": "Infographics, icons"
+      },
+      {
+        "role": "secondary",
+        "hex": "#D81B60",
+        "name": "Salmon Pink",
+        "use": "Highlights, emphasis"
+      },
+      {
+        "role": "text",
+        "hex": "#2C3E50",
+        "name": "Dark Gray",
+        "use": "Body text"
+      }
+    ],
+    "typography": {
+      "display": {
+        "family": "Roboto Condensed",
+        "weight": "700",
+        "use": "Headings, titles",
+        "fallback": "Helvetica"
+      },
+      "body": {
+        "family": "Lato",
+        "weight": "400",
+        "use": "Body text, descriptions",
+        "fallback": "Arial"
+      },
+      "mono": {
+        "family": "Courier New",
+        "weight": "400",
+        "use": "Code snippets, technical terms",
+        "fallback": "Monaco"
+      }
+    },
+    "motion_principles": [
+      {
+        "principle": "Smooth Reveal",
+        "properties_used": [
+          "opacity",
+          "scale"
+        ],
+        "duration_ms": 500,
+        "easing": "cubic-bezier(0.4, 0.0, 0.2, 1)"
+      },
+      {
+        "principle": "Circular Appearances",
+        "properties_used": [
+          "transform",
+          "opacity"
+        ],
+        "duration_ms": 600,
+        "easing": "ease-out"
+      }
+    ],
+    "texture_atmosphere": "<The video will have a clean and professional atmosphere, leveraging subtle texture overlays for depth. Backgrounds will use slight noise textures to enhance the academic feel without distracting from the content.>",
+    "scene_treatments": {
+      "hook": "<Introduce DansLab AI Agent Company with a dynamic zoom-in on their logo, transitioning into an abstract representation of infrastructure droplets and adapters. Use smooth reveal animations for emphasis.>",
+      "thesis": "<Present key insights about AI-driven business growth and scalability using a series of overlaying charts and diagrams. Highlight the ambitious revenue target with a growing dollar sign animation.>",
+      "evidence_1": "<Illustrate Nervix's orchestration framework through an animated flowchart, showcasing droplets and adapters in action. Use circular animations to illustrate interactions between components.>",
+      "evidence_2": "<Demonstrate the growth trajectory of OpenClaw Skill Packs with a data visualization animation, using subtle color shifts for each milestone. Highlight key financial figures with pop-in effects.>",
+      "implication": "<Emphasize the potential impact through an animated transformation from current state to future state, using gradual opacity and scale changes for effect.>",
+      "cta": "<End with a clear call-to-action, encouraging viewers to join the journey towards growth. Use Tech Blue buttons and text overlays that fade in at the end of the video.>"
+    },
+    "asset_checklist": [
+      "Roboto Condensed font",
+      "Lato font",
+      "Courier New font",
+      "Tech Blue color palette",
+      "Earthy Brown color palette",
+      "Salmon Pink color palette",
+      "White Background texture",
+      "Google Chart.js for data visualization",
+      "Nervix logo and icon assets",
+      "Infographic templates"
+    ],
+    "tools_recommended": [
+      "Remotion",
+      "Framer Motion",
+      "Manim"
+    ]
+  },
+  "composition_id": "",
+  "saved_at": "2026-05-05T15:00:34.582439+00:00",
+  "manifest_version": 1
+}

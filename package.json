@@ -1,0 +1,25 @@
+{
+  "name": "Zmarty-Video-Pipeline",
+  "version": "1.0.0",
+  "description": "ZmartyChat Bitcoin Institutional vs Retail Video — Open Source Stack (Remotion + FFmpeg + Flux)",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render src/index.tsx ZmartyBitcoin out/video.mp4",
+    "preview": "remotion preview src/index.tsx ZmartyBitcoin",
+    "upgrade": "npm run remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.455",
+    "@remotion/transitions": "^4.0.455",
+    "@remotion/zod-types": "^4.0.455",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.455",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/web": "^0.0.190",
+    "typescript": "^5.6.3"
+  }
+}

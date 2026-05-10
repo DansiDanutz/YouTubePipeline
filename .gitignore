@@ -1,0 +1,80 @@
+# --- Secrets (NEVER commit) ---
+.env
+.env.*
+!.env.example
+fleet.env
+secrets.env
+*.key
+*.pem
+~/.openclaw/
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+package-lock.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- macOS metadata ---
+.DS_Store
+._*
+
+# --- 3rd-party tooling (external, not our source) ---
+# Users install separately — see tools/README.md
+tools/whisper/
+tools/piper/
+!tools/README.md
+
+# --- Pipeline-generated outputs (not source) ---
+out/
+preview/
+*.mp4
+*.webm
+*.mp3
+*.wav
+*.srt
+*.vtt
+narration*.json
+narration*.txt
+narration*.wav
+narration*.mp3
+elevenlabs_smoke_test.mp3
+
+# --- Logs / state files / runtime data ---
+logs/
+*.log
+.openclaw/
+.openclaude/
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.code-workspace
+.claude/worktrees/
+
+# --- Remotion ---
+.remotion/
+
+# --- Vercel ---
+.vercel/
+
+# --- Skill-DB / scoring / scheduler local state (lives in ~/.openclaw) ---
+# (already excluded by ~/.openclaw/ above)
