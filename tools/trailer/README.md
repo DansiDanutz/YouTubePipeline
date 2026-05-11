@@ -72,11 +72,25 @@ When neither works, the build halts. Both auto-detected; no manual gating.
 - `<out>/narration.aac` — final AAC voiceover (re-encoded from MP3 or AIFF)
 - `<out>/trailer.mp4` — **final 30s deliverable**
 
+## Music bed (Cloud ACE-Step, default-on)
+
+The script auto-generates a cinematic ambient music bed via Cloud ACE-Step (`ace_step_v1_3.5b.safetensors`) and ducks it under the narration. Skip with `TRAILER_NO_MUSIC=1`. Override the music tags / negative tags / duck volume:
+
+```bash
+TRAILER_MUSIC_TAGS="dark cinematic score, tense build, orchestral hits, 110 bpm, instrumental" \
+TRAILER_MUSIC_NEG_TAGS="vocals, lyrics, harsh distortion" \
+TRAILER_MUSIC_VOLUME=0.22 \
+  tools/trailer/build_trailer.sh
+```
+
+The bed is trimmed to the trailer length, fades in 1s, fades out the last 2s, and mixes at ~18% volume so the narration stays primary.
+
 ## Cost
 
 | Component | Cost |
 |---|---|
 | Cloud Flux DEV (6 hero scenes) | ~6 Cloud credits per trailer |
+| Cloud ACE-Step (~32s music) | ~3 Cloud credits per trailer |
 | ElevenLabs Brian Flash v2.5 (~80 words narration) | ~500 ElevenLabs credits per trailer |
 | Ken Burns motion + concat + mux (ffmpeg) | free (local) |
 

@@ -137,13 +137,75 @@ for i in $(seq 1 $SCENE_COUNT); do
   echo "  clip $i: ${SEC}s ($MOTION)"
 done
 
-# ─── Step 5: concat + mux narration ────────────────────────────────────────
+# ─── Step 5a: optional cinematic music bed via Cloud ACE-Step ──────────────
+# Generates a 32s instrumental track and ducks it under the narration.
+# Skip with TRAILER_NO_MUSIC=1 (still produces narration-only mix).
+TRAILER_TOTAL=$(python3 -c "import json; d=json.load(open('$SCENES')); print(sum(x['duration'] for x in d))")
+MUSIC_TAGS="${TRAILER_MUSIC_TAGS:-cinematic ambient, dark electronic, tech documentary, deep bass, evolving atmospheric pad, sparse ethereal synth, slow build, instrumental, no vocals, 90 bpm, modern fintech tone, hopeful resolution}"
+MUSIC_NEG="${TRAILER_MUSIC_NEG_TAGS:-vocals, lyrics, harsh, distorted, drums solo, voice over}"
+MUSIC_VOL="${TRAILER_MUSIC_VOLUME:-0.18}"
+COMFY_KEY="$(security find-generic-password -s 'COMFY_CLOUD_API_KEY' -w 2>/dev/null)"
+
+if [ -z "$TRAILER_NO_MUSIC" ] && [ -n "$COMFY_KEY" ]; then
+  echo
+  echo "===Generate music via Cloud ACE-Step (${TRAILER_TOTAL}s + 2s pad)==="
+  MUSIC_WF=$(python3 -c "
+import json, sys
+prompt = {
+  '1': {'class_type': 'CheckpointLoaderSimple', 'inputs': {'ckpt_name': 'ace_step_v1_3.5b.safetensors'}},
+  '2': {'class_type': 'EmptyAceStepLatentAudio', 'inputs': {'seconds': $TRAILER_TOTAL + 2, 'batch_size': 1}},
+  '3': {'class_type': 'TextEncodeAceStepAudio', 'inputs': {'clip': ['1', 1], 'tags': sys.argv[1], 'lyrics': '', 'lyrics_strength': 0.0}},
+  '4': {'class_type': 'TextEncodeAceStepAudio', 'inputs': {'clip': ['1', 1], 'tags': sys.argv[2], 'lyrics': '', 'lyrics_strength': 0.0}},
+  '5': {'class_type': 'KSampler', 'inputs': {'model': ['1', 0], 'positive': ['3', 0], 'negative': ['4', 0], 'latent_image': ['2', 0], 'seed': 1234, 'steps': 50, 'cfg': 5.0, 'sampler_name': 'euler', 'scheduler': 'simple', 'denoise': 1.0}},
+  '6': {'class_type': 'VAEDecodeAudio', 'inputs': {'samples': ['5', 0], 'vae': ['1', 2]}},
+  '7': {'class_type': 'SaveAudio', 'inputs': {'audio': ['6', 0], 'filename_prefix': 'trailer_music'}},
+}
+print(json.dumps({'prompt': prompt}))" "$MUSIC_TAGS" "$MUSIC_NEG")
+  MUSIC_PID=$(curl -s -X POST -H "X-API-Key: $COMFY_KEY" -H "Content-Type: application/json" \
+    --data "$MUSIC_WF" "$COMFY_CLOUD_BASE/api/prompt" \
+    | python3 -c "import sys,json; print(json.load(sys.stdin).get('prompt_id',''))")
+  echo "  prompt_id: $MUSIC_PID"
+  for tries in $(seq 1 90); do
+    STATUS=$(curl -s -H "X-API-Key: $COMFY_KEY" "$COMFY_CLOUD_BASE/api/jobs/$MUSIC_PID" \
+      | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null)
+    [ "$STATUS" = "completed" ] && break
+    [ "$STATUS" = "failed" ] && { echo "  ⚠️  music failed — proceeding without"; MUSIC_PID=""; break; }
+    sleep 3
+  done
+  if [ -n "$MUSIC_PID" ]; then
+    MFNAME=$(curl -s -H "X-API-Key: $COMFY_KEY" "$COMFY_CLOUD_BASE/api/jobs/$MUSIC_PID" \
+      | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+for nid, no in d.get('outputs',{}).items():
+  for a in no.get('audio',[]):
+    print(a.get('filename')); sys.exit()
+")
+    if [ -n "$MFNAME" ]; then
+      curl -sL -H "X-API-Key: $COMFY_KEY" "$COMFY_CLOUD_BASE/api/view?filename=$MFNAME" -o "$OUT/music.flac"
+      echo "  music: $(du -h "$OUT/music.flac" | awk '{print $1}')"
+    fi
+  fi
+fi
+
+# Build final audio track: narration alone OR narration + music bed
+if [ -f "$OUT/music.flac" ]; then
+  echo
+  echo "===Mix narration + music bed (volume=$MUSIC_VOL)==="
+  ffmpeg -y -i "$OUT/narration.aac" -i "$OUT/music.flac" \
+    -filter_complex "[1:a]atrim=0:$TRAILER_TOTAL,asetpts=PTS-STARTPTS,afade=t=in:st=0:d=1,afade=t=out:st=$((TRAILER_TOTAL - 2)):d=2,volume=$MUSIC_VOL[bed]; [0:a][bed]amix=inputs=2:duration=longest:dropout_transition=2:normalize=0[mix]" \
+    -map "[mix]" -c:a aac -b:a 192k "$OUT/audio_final.aac" 2>/dev/null
+else
+  cp "$OUT/narration.aac" "$OUT/audio_final.aac"
+fi
+
+# ─── Step 5b: concat clips + mux final audio ────────────────────────────────
 echo
 echo "===Concat + mux==="
 > "$OUT/concat.txt"
 for i in $(seq 1 $SCENE_COUNT); do echo "file 'clip_${i}.mp4'" >> "$OUT/concat.txt"; done
 ffmpeg -y -f concat -safe 0 -i "$OUT/concat.txt" -c copy "$OUT/video_no_audio.mp4" 2>/dev/null
-ffmpeg -y -i "$OUT/video_no_audio.mp4" -i "$OUT/narration.aac" \
+ffmpeg -y -i "$OUT/video_no_audio.mp4" -i "$OUT/audio_final.aac" \
   -c:v copy -c:a aac -b:a 192k -movflags +faststart "$OUT/trailer.mp4" 2>/dev/null
 
 echo
