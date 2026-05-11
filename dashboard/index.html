@@ -2868,6 +2868,370 @@
         align-items: flex-start !important;
       }
     }
+
+    /* ════════════════════════════════════════════════════════════════════
+       PREMIUM UPGRADE v3 — Glass · Gradient Underlines · Cinematic Motion
+       Layered ON TOP of the existing token system. No class renames.
+       Theme: deep cyan + warm amber accent (matches DansLab trailer brand).
+       ════════════════════════════════════════════════════════════════════ */
+
+    :root {
+      --accent-amber:       #F5B400;
+      --accent-amber-dim:   rgba(245, 180, 0, 0.14);
+      --accent-amber-glow:  rgba(245, 180, 0, 0.32);
+      --glass-bg:           rgba(15, 22, 35, 0.55);
+      --glass-bg-strong:    rgba(15, 22, 35, 0.78);
+      --glass-border:       rgba(0, 212, 255, 0.16);
+      --glass-blur:         18px;
+      --grad-primary:       linear-gradient(135deg, #00D4FF 0%, #5BC0EB 100%);
+      --grad-amber:         linear-gradient(135deg, #F5B400 0%, #FFD700 100%);
+      --grad-underline:     linear-gradient(90deg, #00D4FF 0%, #F5B400 100%);
+      --grad-text-headline: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
+    }
+
+    /* ── Body: subtle radial vignettes for cinematic depth ──────────── */
+    body {
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,212,255,0.08), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(245,180,0,0.04), transparent 60%),
+        var(--bg) !important;
+      background-attachment: fixed;
+    }
+
+    /* ── Glass material on every panel + card ───────────────────────── */
+    .step-panel,
+    .content-panel > div:not(.content-panel),
+    .container > div {
+      backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    }
+    .step-panel {
+      background: var(--glass-bg) !important;
+      border: 1px solid var(--glass-border) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow:
+        0 18px 40px -12px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(0,212,255,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.04) !important;
+      transition: transform var(--duration) var(--ease-out),
+                  border-color var(--duration) var(--ease-out),
+                  box-shadow var(--duration) var(--ease-out);
+    }
+    .step-panel:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 212, 255, 0.3) !important;
+      box-shadow:
+        0 28px 60px -16px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(0,212,255,0.14),
+        0 0 40px -8px rgba(0,212,255,0.28) !important;
+    }
+
+    /* ── HEADLINE TYPOGRAPHY ────────────────────────────────────────── */
+    .step-panel-title,
+    h1, h2#video-hero-title, .panel-title {
+      background: var(--grad-text-headline);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.012em !important;
+      font-weight: 800 !important;
+    }
+    #video-hero-title {
+      text-shadow: 0 0 24px rgba(0, 212, 255, 0.18);
+    }
+
+    /* ── UNDERLINED FUNCTIONALITY EYEBROWS ──────────────────────────────
+       Every uppercase section label (PRODUCTION SETUP, BACKENDS, LENGTH,
+       SUBTITLES, VOICE, LANGUAGE, etc.) gets a gradient underline so the
+       user can scan the dashboard's functions at a glance. */
+    .step-panel-sub,
+    .label,
+    .field-label,
+    .section-label,
+    [class*="eyebrow"] {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 6px !important;
+      margin-bottom: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.16em !important;
+      text-transform: uppercase;
+      font-size: 11px !important;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .step-panel-sub::after,
+    .label::after,
+    .field-label::after,
+    .section-label::after,
+    [class*="eyebrow"]::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 28px;
+      height: 2px;
+      background: var(--grad-underline);
+      border-radius: 2px;
+      transition: width var(--duration-slow) var(--ease-out);
+    }
+    .step-panel:hover .step-panel-sub::after {
+      width: 100%;
+    }
+
+    /* ── PRIMARY ACTION BUTTONS — premium gradient + sweep highlight ── */
+    .btn.btn-primary,
+    .prompt-submit {
+      position: relative;
+      background: var(--grad-primary) !important;
+      color: #001722 !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.02em !important;
+      border: 1px solid rgba(0, 212, 255, 0.5) !important;
+      box-shadow:
+        0 4px 14px -2px rgba(0,212,255,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.28) !important;
+      overflow: hidden;
+      transition: transform var(--duration) var(--ease-out),
+                  box-shadow var(--duration) var(--ease-out);
+    }
+    .btn.btn-primary::after,
+    .prompt-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+      transform: translateX(-120%);
+      transition: transform 0.7s var(--ease-out);
+      pointer-events: none;
+    }
+    .btn.btn-primary:hover,
+    .prompt-submit:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 8px 22px -4px rgba(0,212,255,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.35) !important;
+    }
+    .btn.btn-primary:hover::after,
+    .prompt-submit:hover::after { transform: translateX(120%); }
+
+    .btn.btn-success {
+      background: linear-gradient(135deg, #00E676 0%, #34D399 100%) !important;
+      color: #002918 !important;
+      border: 1px solid rgba(0, 230, 118, 0.5) !important;
+      box-shadow: 0 4px 14px -2px rgba(0,230,118,0.4) !important;
+    }
+    .btn.btn-warn,
+    .btn.btn-warning {
+      background: var(--grad-amber) !important;
+      color: #2A1F00 !important;
+      border: 1px solid rgba(245, 180, 0, 0.5) !important;
+      box-shadow: 0 4px 14px -2px rgba(245,180,0,0.45) !important;
+    }
+    .btn.btn-outline,
+    .btn.btn-ghost {
+      background: rgba(255, 255, 255, 0.02) !important;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 212, 255, 0.2) !important;
+      color: var(--text) !important;
+      transition: all var(--duration) var(--ease-out);
+    }
+    .btn.btn-outline:hover,
+    .btn.btn-ghost:hover {
+      background: rgba(0, 212, 255, 0.06) !important;
+      border-color: rgba(0, 212, 255, 0.4) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── BACKEND STATUS ROWS — refined chips ────────────────────────── */
+    .badge,
+    [class*="backend-row"],
+    [class*="provider-pill"] {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      transition: border-color var(--duration) var(--ease-out),
+                  background var(--duration) var(--ease-out);
+    }
+    .badge:hover { border-color: var(--border-hover); }
+
+    .badge.badge-success {
+      background: var(--success-dim);
+      border-color: rgba(0, 230, 118, 0.3);
+      color: #6FE7AB;
+    }
+    .badge.badge-info {
+      background: var(--primary-dim);
+      border-color: rgba(0, 212, 255, 0.3);
+      color: var(--primary);
+    }
+    .badge.badge-muted {
+      background: rgba(255,255,255,0.02);
+      border-color: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+    }
+
+    /* ── ANIMATED STATUS DOTS (pulse indicator) ─────────────────────── */
+    .dot {
+      display: inline-block;
+      position: relative;
+    }
+    .dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.4;
+      animation: ping-dot 2.4s var(--ease-out) infinite;
+    }
+    @keyframes ping-dot {
+      0%   { transform: scale(0.6); opacity: 0.5; }
+      80%  { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    /* ── PROGRESS BARS — refined gradient + glow ────────────────────── */
+    .bar {
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .bar-fill {
+      background: var(--grad-primary) !important;
+      box-shadow:
+        0 0 12px rgba(0,212,255,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: width var(--duration-slow) var(--ease-out);
+    }
+
+    /* ── INPUT FIELDS — glass treatment with smoother focus ─────────── */
+    input[type="text"],
+    input[type="number"],
+    input[type="search"],
+    select, textarea {
+      background: rgba(7, 10, 18, 0.7) !important;
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border) !important;
+      border-radius: var(--radius) !important;
+      transition: all var(--duration) var(--ease-out);
+    }
+    input[type="text"]:hover, input[type="number"]:hover, select:hover, textarea:hover {
+      border-color: var(--border-hover) !important;
+    }
+    input:focus, select:focus, textarea:focus, button:focus-visible {
+      outline: none !important;
+      border-color: var(--primary) !important;
+      box-shadow: var(--ring) !important;
+    }
+
+    /* ── ARTIFACT CHIPS / CHIPS WITH ICONS ─────────────────────────── */
+    .artifact-chip,
+    [class*="chip"] {
+      background: rgba(0, 212, 255, 0.06);
+      border: 1px solid rgba(0, 212, 255, 0.18);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--primary);
+      transition: all var(--duration) var(--ease-out);
+    }
+    .artifact-chip:hover {
+      background: rgba(0, 212, 255, 0.12);
+      border-color: rgba(0, 212, 255, 0.32);
+    }
+
+    /* ── CODE BLOCKS — terminal aesthetic ──────────────────────────── */
+    .code-block, pre, code {
+      background: rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: var(--radius) !important;
+      font-family: var(--mono);
+    }
+
+    /* ── HORIZONTAL RULES — dividers as subtle gradients ──────────── */
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0,212,255,0.18) 50%,
+        transparent 100%);
+      margin: var(--space-6) 0;
+    }
+
+    /* ── PIPELINE PROGRESS METABLOCKS ──────────────────────────────── */
+    .step-meta,
+    [class*="meta-chip"],
+    [class*="step-tag"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── CINEMATIC FADE-IN ON LOAD (subtle) ────────────────────────── */
+    .step-panel,
+    .content-panel {
+      animation: panel-fade-in 0.6s var(--ease-out) backwards;
+    }
+    .content-panel:nth-child(1) { animation-delay: 0.05s; }
+    .content-panel:nth-child(2) { animation-delay: 0.10s; }
+    .content-panel:nth-child(3) { animation-delay: 0.15s; }
+    .content-panel:nth-child(4) { animation-delay: 0.20s; }
+    .content-panel:nth-child(5) { animation-delay: 0.25s; }
+    @keyframes panel-fade-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SCROLL BAR — themed ───────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.18);
+      border-radius: 999px;
+      border: 2px solid var(--bg);
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.32); }
+
+    /* ── HERO PANEL: cinematic surface ─────────────────────────────── */
+    [id*="video-hero"],
+    [class*="video-hero"] {
+      background:
+        radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 60%),
+        var(--glass-bg) !important;
+      border: 1px solid var(--glass-border) !important;
+      border-radius: var(--radius-xl) !important;
+      box-shadow:
+        0 32px 80px -20px rgba(0,0,0,0.85),
+        0 0 0 1px rgba(0,212,255,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.04) !important;
+    }
+
+    /* ── BRAND ACCENT: amber CTAs / "FIX" buttons ─────────────────── */
+    button[onclick*="Fix"],
+    button[onclick*="fix"],
+    .btn-fix {
+      background: var(--grad-amber) !important;
+      color: #2A1F00 !important;
+      font-weight: 700 !important;
+      border: 1px solid rgba(245, 180, 0, 0.5) !important;
+      box-shadow: 0 4px 14px -2px var(--accent-amber-glow) !important;
+    }
+
   </style>
 </head>
 <body>
