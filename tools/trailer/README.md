@@ -1,17 +1,18 @@
 # Trailer Builder
 
-30-second cinematic trailer pipeline. Cloud Flux DEV for hero scenes + ffmpeg Ken Burns motion + macOS `say` narration + ffmpeg assembly. Verified live 2026-05-11 — produces 1920x1080 H.264+AAC MP4 in ~3 minutes wall-clock.
+30-second cinematic trailer pipeline. Cloud Flux DEV for hero scenes + ElevenLabs Brian narration (with macOS `say` fallback) + ffmpeg Ken Burns motion + ffmpeg assembly. Verified live 2026-05-11 — produces 1920x1080 H.264+AAC MP4 with premium voiceover in ~3 minutes wall-clock.
 
 ## Requirements
 
 - `security find-generic-password -s COMFY_CLOUD_API_KEY` returns the Cloud key (M11 wired this)
-- macOS `say` (built-in)
+- `security find-generic-password -s ELEVENLABS_API_KEY` returns the ElevenLabs key (recommended for production-quality voiceover)
+- macOS `say` (built-in fallback when ElevenLabs key missing)
 - `ffmpeg` 8.x with libx264 + AAC
 
 ## Usage
 
 ```bash
-# Default: builds DansLab trailer
+# Default: builds DansLab trailer with ElevenLabs Brian voice
 tools/trailer/build_trailer.sh
 
 # Custom scenes + output dir
@@ -35,21 +36,48 @@ Total trailer length = sum of `duration` across all scenes.
 
 ## Customizing narration
 
-Set the env var before running:
+Set env vars before running:
 
 ```bash
+# Custom script (works for both ElevenLabs and 'say')
 TRAILER_NARRATION="Your custom 30-second narration here..." \
-SAY_VOICE=Tom SAY_RATE=170 \
-tools/trailer/build_trailer.sh
+  tools/trailer/build_trailer.sh
+
+# Force a different ElevenLabs voice (default: Brian = nPczCjzI2devNBz1zQrb)
+ELEVENLABS_VOICE_BRIAN=<voice_id> \
+  tools/trailer/build_trailer.sh
+
+# Force a different ElevenLabs model (default: eleven_flash_v2_5 — fastest, cheapest)
+# Alternatives: eleven_multilingual_v2 (best quality, more credits)
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2 \
+  tools/trailer/build_trailer.sh
+
+# Force macOS 'say' fallback even when ElevenLabs key present
+ELEVENLABS_API_KEY="" SAY_VOICE=Tom SAY_RATE=170 \
+  tools/trailer/build_trailer.sh
 ```
+
+## Voice routing priority
+
+1. **ElevenLabs Brian** (Flash v2.5) — when `ELEVENLABS_API_KEY` resolvable
+2. **macOS `say` Alex** — fallback (basic but always works)
+
+When neither works, the build halts. Both auto-detected; no manual gating.
 
 ## Output
 
 - `<out>/scene_N.png` — 1920x1080 hero images
 - `<out>/clip_N.mp4` — Ken Burns motion clips
-- `<out>/narration.aac` — AAC voice-over
+- `<out>/narration.mp3` — ElevenLabs Brian (when active)
+- `<out>/narration.aac` — final AAC voiceover (re-encoded from MP3 or AIFF)
 - `<out>/trailer.mp4` — **final 30s deliverable**
 
 ## Cost
 
-~6 Cloud Flux DEV credits per trailer. Local rendering would OOM on Mac M-series for Flux DEV (use Flux schnell locally for drafts; Cloud for production).
+| Component | Cost |
+|---|---|
+| Cloud Flux DEV (6 hero scenes) | ~6 Cloud credits per trailer |
+| ElevenLabs Brian Flash v2.5 (~80 words narration) | ~500 ElevenLabs credits per trailer |
+| Ken Burns motion + concat + mux (ffmpeg) | free (local) |
+
+Local rendering would OOM on Mac M-series for Flux DEV (use Flux schnell locally for drafts; Cloud for production). ElevenLabs Flash v2.5 is ~10x cheaper than Multilingual v2 with negligible quality loss for short trailers.

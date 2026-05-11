@@ -75,13 +75,44 @@ for nid, no in d.get('outputs',{}).items():
   done
 done
 
-# ─── Step 3: narration via macOS say ───────────────────────────────────────
+# ─── Step 3: narration ─────────────────────────────────────────────────────
+# Priority order:
+#   1. ElevenLabs Brian (Flash v2.5) — when ELEVENLABS_API_KEY in Keychain
+#   2. macOS 'say' Alex — fallback (always available, basic quality)
+# Override Brian voice id with $ELEVENLABS_VOICE_BRIAN; override model with
+# $ELEVENLABS_MODEL_ID (default: eleven_flash_v2_5).
 echo
-echo "===Narration via 'say' ($SAY_VOICE @ $SAY_RATE wpm)==="
-say -v "$SAY_VOICE" -r "$SAY_RATE" -o "$OUT/narration.aiff" "$NARRATION"
-ffmpeg -y -i "$OUT/narration.aiff" -c:a aac -b:a 192k "$OUT/narration.aac" 2>/dev/null
-NARR_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT/narration.aac")
-echo "  narration: ${NARR_DUR}s"
+ELEVEN_KEY="$(security find-generic-password -s 'ELEVENLABS_API_KEY' -w 2>/dev/null)"
+BRIAN_ID="${ELEVENLABS_VOICE_BRIAN:-nPczCjzI2devNBz1zQrb}"
+ELEVEN_MODEL="${ELEVENLABS_MODEL_ID:-eleven_flash_v2_5}"
+if [ -n "$ELEVEN_KEY" ]; then
+  echo "===Narration via ElevenLabs Brian ($ELEVEN_MODEL)==="
+  ELEVEN_JSON=$(python3 -c "
+import json, sys
+print(json.dumps({
+  'text': sys.argv[1],
+  'model_id': sys.argv[2],
+  'voice_settings': {'stability': 0.5, 'similarity_boost': 0.75, 'style': 0.4, 'use_speaker_boost': True},
+}))" "$NARRATION" "$ELEVEN_MODEL")
+  CODE=$(curl -s -X POST "https://api.elevenlabs.io/v1/text-to-speech/$BRIAN_ID" \
+    -H "xi-api-key: $ELEVEN_KEY" -H "Content-Type: application/json" -d "$ELEVEN_JSON" \
+    -o "$OUT/narration.mp3" -w "%{http_code}")
+  if [ "$CODE" = "200" ]; then
+    ffmpeg -y -i "$OUT/narration.mp3" -c:a aac -b:a 192k "$OUT/narration.aac" 2>/dev/null
+    NARR_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT/narration.aac")
+    echo "  narration: ${NARR_DUR}s (Brian, premium)"
+  else
+    echo "  ⚠️ ElevenLabs returned HTTP $CODE — falling back to macOS say"
+    ELEVEN_KEY=""
+  fi
+fi
+if [ -z "$ELEVEN_KEY" ]; then
+  echo "===Narration via macOS 'say' ($SAY_VOICE @ $SAY_RATE wpm)==="
+  say -v "$SAY_VOICE" -r "$SAY_RATE" -o "$OUT/narration.aiff" "$NARRATION"
+  ffmpeg -y -i "$OUT/narration.aiff" -c:a aac -b:a 192k "$OUT/narration.aac" 2>/dev/null
+  NARR_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT/narration.aac")
+  echo "  narration: ${NARR_DUR}s (macOS Alex, basic)"
+fi
 
 # ─── Step 4: HD Ken Burns motion clips (1920x1080) ─────────────────────────
 echo
