@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1, "duration": 5, "motion": "zoom_in",
+    "prompt": "Cinematic establishing shot of a dark futuristic AI laboratory at midnight, deep black backdrop with subtle teal glow from floating holographic interfaces, single workstation with multiple data panels in the air, no people visible, soft volumetric lighting, lens flare, premium fintech documentary aesthetic, ultra-sharp 8K render"
+  },
+  {
+    "id": 2, "duration": 5, "motion": "pan_right",
+    "prompt": "Cinematic shot of four abstract glowing teal robotic silhouettes arranged in formation against a deep black void, each figure represents a specialized AI agent, neon teal accent on each silhouette, ultra-modern minimalist composition, soft volumetric lighting, premium tech aesthetic, ultra-sharp 8K render"
+  },
+  {
+    "id": 3, "duration": 4, "motion": "zoom_in",
+    "prompt": "Extreme close-up of teal glowing code terminal text streaming on a deep black screen, lines of autonomously generated code, abstract data visualization, premium cinematic depth of field, no people, minimalist tech aesthetic, lens flare, ultra-sharp 8K render"
+  },
+  {
+    "id": 4, "duration": 4, "motion": "pan_left",
+    "prompt": "Futuristic Bloomberg-style trading dashboard in deep black mode, glowing teal candlestick charts moving, holographic data overlays, subtle gold accents on key data points, abstract financial visualization, no people, premium fintech aesthetic, lens flare, ultra-sharp 8K render"
+  },
+  {
+    "id": 5, "duration": 4, "motion": "zoom_out",
+    "prompt": "Abstract cinematic shot of a glowing teal AI agent being assembled from thousands of light particles against a deep black void, generative birth visualization, ethereal sci-fi aesthetic, soft volumetric lighting, premium tech documentary style, ultra-sharp 8K render"
+  },
+  {
+    "id": 6, "duration": 8, "motion": "zoom_in_slow",
+    "prompt": "Cinematic premium SaaS hero shot on deep black void, large glowing teal letters D and L in elegant serif typography centered, subtle gold accent ring of light around the logo, lens flare bloom, Apple-level product photography, trustworthy fintech aesthetic, ultra-sharp 8K render"
+  }
+]
