@@ -209,6 +209,49 @@ ffmpeg -y -i "$OUT/video_no_audio.mp4" -i "$OUT/audio_final.aac" \
   -c:v copy -c:a aac -b:a 192k -movflags +faststart "$OUT/trailer.mp4" 2>/dev/null
 
 echo
-echo "===FINAL TRAILER: $OUT/trailer.mp4 ==="
+echo "===FINAL TRAILER (16:9): $OUT/trailer.mp4 ==="
 ls -lh "$OUT/trailer.mp4"
 ffprobe -v error -select_streams v -show_entries stream=width,height,r_frame_rate -show_entries format=duration -of default=nk=1:nw=0 "$OUT/trailer.mp4"
+
+# ─── Step 6: SRT subtitles via Whisper (sidecar for YouTube/TikTok auto-CC) ─
+# YouTube + TikTok + Reels read SRT sidecars and render closed captions
+# automatically. Skip with TRAILER_NO_SUBS=1.
+NARR_SRC="$OUT/narration.mp3"
+[ ! -f "$NARR_SRC" ] && NARR_SRC="$OUT/narration.aiff"
+WHISPER_BIN="$(command -v whisper)"
+if [ -z "$TRAILER_NO_SUBS" ] && [ -n "$WHISPER_BIN" ] && [ -f "$NARR_SRC" ]; then
+  echo
+  echo "===Transcribe to SRT (whisper small.en)==="
+  "$WHISPER_BIN" "$NARR_SRC" --model small.en --language en \
+    --output_format srt --output_dir "$OUT" --verbose False 2>&1 | tail -2
+  SRT_FILE="$OUT/$(basename "${NARR_SRC%.*}").srt"
+  if [ -f "$SRT_FILE" ]; then
+    cp "$SRT_FILE" "$OUT/trailer.srt"
+    echo "  sidecar: $OUT/trailer.srt ($(du -h "$OUT/trailer.srt" | awk '{print $1}'))"
+  fi
+fi
+
+# ─── Step 7: 9:16 vertical reframe for TikTok/Shorts/Reels ──────────────────
+# Blurred backdrop + centered HD content, mobile-safe MarginV.
+# Skip with TRAILER_NO_VERTICAL=1.
+if [ -z "$TRAILER_NO_VERTICAL" ]; then
+  echo
+  echo "===Build 9:16 vertical (1080x1920) — blurred bg + centered HD==="
+  ffmpeg -y -i "$OUT/trailer.mp4" \
+    -filter_complex "[0:v]split[bg][fg];\
+         [bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=20:3,eq=brightness=-0.18[bgblur];\
+         [fg]scale=1080:608[fghd];\
+         [bgblur][fghd]overlay=(W-w)/2:(H-h)/2[v]" \
+    -map "[v]" -map 0:a \
+    -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p \
+    -c:a copy -movflags +faststart "$OUT/trailer_vertical.mp4" 2>/dev/null
+  echo "  vertical: $OUT/trailer_vertical.mp4 ($(du -h "$OUT/trailer_vertical.mp4" | awk '{print $1}'))"
+fi
+
+echo
+echo "═══════════════════════════════════════════════════════════════"
+echo " TRAILER PACK READY"
+echo "═══════════════════════════════════════════════════════════════"
+[ -f "$OUT/trailer.mp4" ]          && echo "  16:9 landscape : $OUT/trailer.mp4"
+[ -f "$OUT/trailer_vertical.mp4" ] && echo "  9:16 vertical  : $OUT/trailer_vertical.mp4"
+[ -f "$OUT/trailer.srt" ]          && echo "  SRT sidecar    : $OUT/trailer.srt  (YouTube/TikTok auto-CC)"

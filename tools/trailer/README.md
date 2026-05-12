@@ -64,13 +64,31 @@ ELEVENLABS_API_KEY="" SAY_VOICE=Tom SAY_RATE=170 \
 
 When neither works, the build halts. Both auto-detected; no manual gating.
 
-## Output
+## Output — full trailer pack
 
-- `<out>/scene_N.png` — 1920x1080 hero images
+The script ships **three deliverables** in one run:
+
+| File | Format | Purpose |
+|---|---|---|
+| `<out>/trailer.mp4` | **1920×1080 H.264+AAC** | YouTube standard, web embed, hero reel |
+| `<out>/trailer_vertical.mp4` | **1080×1920 H.264+AAC** | TikTok / Shorts / Reels (blurred backdrop + centered HD) |
+| `<out>/trailer.srt` | **SRT sidecar** | YouTube + TikTok + Reels auto-render as closed captions |
+
+Plus intermediates kept for debugging / reuse:
+- `<out>/scene_N.png` — 1920×1080 hero images
 - `<out>/clip_N.mp4` — Ken Burns motion clips
 - `<out>/narration.mp3` — ElevenLabs Brian (when active)
-- `<out>/narration.aac` — final AAC voiceover (re-encoded from MP3 or AIFF)
-- `<out>/trailer.mp4` — **final 30s deliverable**
+- `<out>/narration.aac` — final AAC voiceover
+- `<out>/music.flac` — ACE-Step music bed (when generated)
+
+Skip the extras:
+```bash
+TRAILER_NO_VERTICAL=1 tools/trailer/build_trailer.sh   # landscape only
+TRAILER_NO_SUBS=1     tools/trailer/build_trailer.sh   # no SRT
+TRAILER_NO_MUSIC=1    tools/trailer/build_trailer.sh   # narration-only audio
+```
+
+> **Note on burned-in subs:** Homebrew's default `ffmpeg` ships without `libass` so the `subtitles=` filter isn't available. The SRT sidecar covers the 95% case (YouTube + TikTok + Reels auto-render it). For burn-in, `brew install homebrew/core/ffmpeg --formula` with libass-enabled tap, then rerun the script.
 
 ## Music bed (Cloud ACE-Step, default-on)
 
